@@ -16,5 +16,6 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - { name: "title", label: "Title" }
-      - { name: "youtube_id", label: "YouTube Video ID" }
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "youtube_id", label: "YouTube Video ID", widget: "string" }
+
