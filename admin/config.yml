@@ -1,0 +1,19 @@
+backend:
+  name: github
+  repo: abutahir47/voices-of-truth
+  branch: main
+
+site_url: https://voicesoftruth.netlify.app
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "videos"
+    label: "Videos"
+    folder: "content/videos"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: "title", label: "Title" }
+      - { name: "youtube_id", label: "YouTube Video ID" }
