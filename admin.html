@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Videos</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; }
+    label { display: block; margin-top: 20px; font-weight: bold; }
+    input, button { width: 100%; padding: 10px; margin-top: 5px; }
+    textarea { width: 100%; height: 100px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel: Add Video</h1>
+
+  <label>GitHub Personal Access Token</label>
+  <input type="password" id="token" placeholder="Paste your GitHub token" />
+
+  <label>Video Title</label>
+  <input type="text" id="title" placeholder="Enter video title" />
+
+  <label>YouTube Video ID</label>
+  <input type="text" id="youtubeId" placeholder="e.g., dQw4w9WgXcQ" />
+
+  <button onclick="submitVideo()">Save Video</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function submitVideo() {
+      const token = document.getElementById('token').value.trim();
+      const title = document.getElementById('title').value.trim();
+      const youtubeId = document.getElementById('youtubeId').value.trim();
+
+      if (!token || !title || !youtubeId) {
+        document.getElementById('status').innerText = 'All fields are required.';
+        return;
+      }
+
+      const repo = 'abutahir47/voices-of-truth';
+      const path = 'content/videos/videos.json';
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+      // Step 1: Get current file content
+      let response = await fetch(apiUrl, {
+        headers: { Authorization: `token ${token}` }
+      });
+
+      let data = await response.json();
+      let content = [];
+      let sha = null;
+
+      if (data.content) {
+        content = JSON.parse(atob(data.content));
+        sha = data.sha;
+      }
+
+      // Add new video
+      content.push({ title, youtubeId });
+
+      const newContent = btoa(JSON.stringify(content, null, 2));
+
+      const commit = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Add new video',
+          content: newContent,
+          sha
+        })
+      });
+
+      if (commit.ok) {
+        document.getElementById('status').innerText = '✅ Video saved! Netlify will redeploy shortly.';
+        document.getElementById('title').value = '';
+        document.getElementById('youtubeId').value = '';
+      } else {
+        document.getElementById('status').innerText = '❌ Error saving video.';
+      }
+    }
+  </script>
+</body>
+</html>
